@@ -1,0 +1,36 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 012cfb32029a72cfccd2ceafdb9c279d.dir
+      size: 208870679
+      nfiles: 7968
+    - path: src/prepare.py
+      hash: md5
+      md5: 8fe458bf0ebb869d7ad6c274e8869117
+      size: 7212
+    params:
+      params.yaml:
+        prepare:
+          raw_dir: data/raw
+          out_dir: data/processed
+          classes:
+          - bird
+          - drone
+          - plane
+          min_box_size: 2
+          dedupe:
+            enabled: true
+            hash_size: 8
+            max_hamming: 4
+          n_samples: 12
+          seed: 42
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: ed3143585b5d5c48a47fef6ec2a1616b.dir
+      size: 1459218
+      nfiles: 4

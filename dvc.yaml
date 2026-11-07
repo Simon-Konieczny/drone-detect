@@ -1,0 +1,16 @@
+# dvc.yaml
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps: [src/prepare.py, data/raw]
+    params: [prepare]
+    outs: [data/processed]
+  train:
+    cmd: python src/train.py
+    deps: [src/train.py, data/processed]
+    params: [train]
+    outs: [models/model.pt]
+  evaluate:
+    cmd: python src/evaluate.py
+    deps: [src/evaluate.py, models/model.pt, data/processed]
+    metrics: [{metrics.json: {cache: false}}]

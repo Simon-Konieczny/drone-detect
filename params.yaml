@@ -1,0 +1,11 @@
+prepare:
+  raw_dir: data/raw
+  out_dir: data/processed
+  classes: [bird, drone, plane]
+  min_box_size: 2
+  dedupe:
+    enabled: true
+    hash_size: 8
+    max_hamming: 4
+  n_samples: 12
+  seed: 42
