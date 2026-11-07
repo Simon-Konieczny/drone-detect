@@ -1,11 +1,64 @@
 prepare:
   raw_dir: data/raw
   out_dir: data/processed
-  classes: [bird, drone, plane]
+  classes:
+  - bird
+  - drone
+  - plane
+  - helicopter
+  - insect
   min_box_size: 2
+  unknown_category_policy: drop_image
   dedupe:
     enabled: true
     hash_size: 8
     max_hamming: 4
+  resplit:
+    enabled: true
+    n_folds: 10
+    priority: [drone, insect, helicopter, plane, bird]
+    flock_class: bird
+    flock_min_boxes: 5
   n_samples: 12
   seed: 42
+
+augment:
+  preset: strong                    # none | light | strong
+
+train:
+  epochs: 20
+  patience: 5
+  batch_size: 8
+  num_workers: 4
+  lr: 0.01
+  momentum: 0.9
+  weight_decay: 0.0001
+  warmup_iters: 300
+  grad_clip: 10.0
+  amp: false
+  min_size: 800
+  max_size: 1333
+  trainable_backbone_layers: 3
+  seed: 42
+  experiment: drone-detection
+  mlflow_uri: sqlite:///mlflow.db
+  register_model: true
+  registered_model_name: drone-detector
+
+evaluate:
+  batch_size: 8
+  num_workers: 2
+  bootstrap_iters: 200
+  ci: 0.95
+  target_precision: 0.9
+  corruption: [motion_blur, noise, jpeg_q20, fog, low_light]
+  seed: 42
+
+export:
+  opset: 17
+  num_threads: 4
+  parity_images: 100
+  parity_tol: 0.01                # max allowed |mAP_torch - mAP_onnx|
+  warmup_runs: 5
+  latency_runs: 30
+  fallback_score_threshold: 0.5
