@@ -10,8 +10,8 @@ stages:
       nfiles: 7968
     - path: src/prepare.py
       hash: md5
-      md5: 8fe458bf0ebb869d7ad6c274e8869117
-      size: 7212
+      md5: d1179d13d37a10a151eb22b5d7aa088c
+      size: 11856
     params:
       params.yaml:
         prepare:
@@ -21,16 +21,101 @@ stages:
           - bird
           - drone
           - plane
+          - helicopter
+          - insect
           min_box_size: 2
+          unknown_category_policy: drop_image
           dedupe:
             enabled: true
             hash_size: 8
             max_hamming: 4
+          resplit:
+            enabled: true
+            n_folds: 10
+            priority:
+            - drone
+            - insect
+            - helicopter
+            - plane
+            - bird
+            flock_class: bird
+            flock_min_boxes: 5
           n_samples: 12
           seed: 42
     outs:
     - path: data/processed
       hash: md5
-      md5: ed3143585b5d5c48a47fef6ec2a1616b.dir
-      size: 1459218
+      md5: e0969c36a37fb08469d9939d8f881e65.dir
+      size: 1762604
       nfiles: 4
+    - path: reports/data_stats.json
+      hash: md5
+      md5: cf2a24c55519963795e7e5bdfe013f83
+      size: 3385
+    - path: reports/samples
+      hash: md5
+      md5: b4ce9bcb2f44ab6de5021c3201170c81.dir
+      size: 352385
+      nfiles: 12
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 5a8bafca2c4b1f71dc80769b7f1dd272.dir
+      size: 1510253
+      nfiles: 4
+    - path: src/dataset.py
+      hash: md5
+      md5: e4731d64145c254672e7704e5b5971bf
+      size: 1714
+    - path: src/engine.py
+      hash: md5
+      md5: 64e98da3bb8d8e17458c8afdc289084b
+      size: 2805
+    - path: src/train.py
+      hash: md5
+      md5: 04da1a70fe36226d5aab3128a369d7ef
+      size: 7955
+    - path: src/transforms.py
+      hash: md5
+      md5: f3008c011e9d59f44f847ed64cfa822b
+      size: 3459
+    params:
+      params.yaml:
+        augment:
+          preset: strong
+        prepare.classes:
+        - bird
+        - drone
+        - plane
+        - helicopter
+        - insect
+        train:
+          epochs: 1
+          patience: 5
+          batch_size: 8
+          num_workers: 4
+          lr: 0.01
+          momentum: 0.9
+          weight_decay: 0.0001
+          warmup_iters: 300
+          grad_clip: 10.0
+          amp: false
+          min_size: 800
+          max_size: 1333
+          trainable_backbone_layers: 3
+          seed: 42
+          experiment: drone-detection
+          mlflow_uri: sqlite:///mlflow.db
+          register_model: true
+          registered_model_name: drone-detector
+    outs:
+    - path: models/model.pt
+      hash: md5
+      md5: 2738dde39e96b0a918bc87bb13f3d234
+      size: 76084675
+    - path: reports/train_metrics.json
+      hash: md5
+      md5: 9455a9aef0fcb9a8d4ec00dd5001e56b
+      size: 340

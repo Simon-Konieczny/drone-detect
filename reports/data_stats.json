@@ -1,99 +1,170 @@
 {
   "splits": {
     "train": {
-      "images": 7101,
-      "empty_images": 1405,
+      "images": 6259,
+      "empty_images": 8,
       "boxes_per_class": {
-        "plane": 2180,
-        "drone": 2676,
-        "bird": 3571
+        "helicopter": 1228,
+        "plane": 1845,
+        "drone": 2380,
+        "bird": 9519,
+        "insect": 603
       },
       "size_buckets": {
+        "helicopter": {
+          "large": 363,
+          "medium": 756,
+          "small": 109
+        },
         "plane": {
-          "large": 594,
-          "small": 347,
-          "medium": 1239
+          "large": 512,
+          "small": 294,
+          "medium": 1039
         },
         "drone": {
-          "large": 1434,
-          "small": 367,
-          "medium": 875
+          "large": 1237,
+          "small": 354,
+          "medium": 789
         },
         "bird": {
-          "medium": 2204,
-          "small": 1127,
-          "large": 240
+          "small": 5122,
+          "medium": 3950,
+          "large": 447
+        },
+        "insect": {
+          "large": 227,
+          "medium": 265,
+          "small": 111
         }
       }
     },
     "valid": {
-      "images": 424,
-      "empty_images": 14,
+      "images": 783,
+      "empty_images": 1,
       "boxes_per_class": {
-        "bird": 4673,
-        "drone": 93,
-        "plane": 92
+        "bird": 952,
+        "helicopter": 139,
+        "drone": 297,
+        "plane": 228,
+        "insect": 70
       },
       "size_buckets": {
         "bird": {
-          "small": 3021,
-          "medium": 1522,
-          "large": 130
+          "small": 463,
+          "medium": 421,
+          "large": 68
         },
-        "drone": {
-          "medium": 42,
-          "large": 40,
+        "helicopter": {
+          "large": 41,
+          "medium": 87,
           "small": 11
         },
+        "drone": {
+          "medium": 94,
+          "small": 47,
+          "large": 156
+        },
         "plane": {
-          "large": 38,
-          "medium": 53,
-          "small": 1
+          "large": 71,
+          "medium": 127,
+          "small": 30
+        },
+        "insect": {
+          "medium": 28,
+          "large": 27,
+          "small": 15
         }
       }
     },
     "test": {
-      "images": 181,
-      "empty_images": 5,
+      "images": 783,
+      "empty_images": 1,
       "boxes_per_class": {
-        "bird": 1660,
-        "drone": 48,
-        "plane": 25
+        "bird": 947,
+        "plane": 225,
+        "drone": 297,
+        "helicopter": 153,
+        "insect": 70
       },
       "size_buckets": {
         "bird": {
-          "large": 169,
-          "small": 983,
-          "medium": 508
-        },
-        "drone": {
-          "large": 22,
-          "medium": 22,
-          "small": 4
+          "medium": 512,
+          "small": 385,
+          "large": 50
         },
         "plane": {
-          "large": 18,
-          "medium": 7
+          "medium": 133,
+          "large": 68,
+          "small": 24
+        },
+        "drone": {
+          "large": 198,
+          "medium": 81,
+          "small": 18
+        },
+        "helicopter": {
+          "medium": 101,
+          "large": 39,
+          "small": 13
+        },
+        "insect": {
+          "medium": 45,
+          "large": 25
         }
       }
+    }
+  },
+  "strata": {
+    "train": {
+      "helicopter": 864,
+      "plane": 1603,
+      "drone": 2348,
+      "bird": 871,
+      "bird_flock": 383,
+      "insect": 182,
+      "empty": 8
+    },
+    "valid": {
+      "bird": 109,
+      "helicopter": 108,
+      "drone": 293,
+      "plane": 201,
+      "bird_flock": 48,
+      "insect": 23,
+      "empty": 1
+    },
+    "test": {
+      "bird_flock": 48,
+      "plane": 200,
+      "drone": 294,
+      "helicopter": 108,
+      "bird": 109,
+      "insect": 23,
+      "empty": 1
     }
   },
   "dropped": {
     "train": {
-      "unknown_category": 2390,
-      "degenerate_box": 1
+      "unknown_category_box:0": 126,
+      "image_with_unknown_category": 126,
+      "degenerate_box": 2
     },
     "valid": {
-      "unknown_category": 7
+      "unknown_category_box:0": 7,
+      "image_with_unknown_category": 7
     },
     "test": {
-      "unknown_category": 5,
+      "unknown_category_box:0": 5,
+      "image_with_unknown_category": 5,
       "degenerate_box": 2
     }
   },
   "leakage": {
-    "train_internal_duplicates": 186,
-    "valid_removed_near_duplicates": 148,
-    "test_removed_near_duplicates": 109
+    "strategy": "grouped_stratified_resplit",
+    "pooled_images": 7825,
+    "duplicate_groups": 406,
+    "images_in_duplicate_groups": 2318,
+    "largest_group": 314,
+    "cross_split_near_duplicates": 0
   }
 }

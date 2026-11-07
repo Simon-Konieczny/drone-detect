@@ -4,13 +4,23 @@ stages:
     cmd: python src/prepare.py
     deps: [src/prepare.py, data/raw]
     params: [prepare]
-    outs: [data/processed]
+    outs: [data/processed, reports/samples]
+    metrics:
+      - reports/data_stats.json:
+          cache: false
+
   train:
     cmd: python src/train.py
-    deps: [src/train.py, data/processed]
-    params: [train]
+    deps: [src/train.py, src/engine.py, src/dataset.py, src/transforms.py, data/processed]
+    params: [train, augment, prepare.classes]
     outs: [models/model.pt]
+    metrics:
+      - reports/train_metrics.json:
+          cache: false
+
   evaluate:
     cmd: python src/evaluate.py
-    deps: [src/evaluate.py, models/model.pt, data/processed]
-    metrics: [{metrics.json: {cache: false}}]
+    deps: [src/evaluate.py, src/dataset.py, models/model.pt, data/processed]
+    metrics:
+      - metrics.json:
+          cache: false
