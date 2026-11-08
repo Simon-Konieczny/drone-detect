@@ -13,20 +13,26 @@ def _to_device(images, targets, device):
     return images, targets
 
 def train_one_epoch(model, loader, optimizer, scheduler, scaler, device,
-                    use_amp: bool, grad_clip: float | None) -> dict[str, float]:
+                    use_amp: bool, grad_clip: float | None, amp_dtype: torch.dtype = torch.float16,
+                    max_nonfinite_batches: int = 10) -> dict[str, float]:
     """Returns the epoch mean of the total loss and each component."""
     model.train()
     sums: dict[str, float] = defaultdict(float)
-    n = 0
-    for images, targets in loader:
+    n, skipped = 0, 0
+    for it, (images, targets) in enumerate(loader):
         images, targets = _to_device(images, targets, device)
-        amp_ctx = torch.autocast(device_type="cuda") if use_amp else contextlib.nullcontext()
+        amp_ctx = torch.autocast(device_type="cuda", dtype=amp_dtype) if use_amp else contextlib.nullcontext()
         with amp_ctx:
             loss_dict = model(images, targets)
             loss = sum(loss_dict.values())
         if not torch.isfinite(loss):
+            skipped += 1
             parts = {k: round(v.item(), 4) for k, v in loss_dict.items()}
-            raise FloatingPointError(f"Non-finite loss {loss.item()}: {parts}. Lower LR or check boxes.")
+            print(f"[warn] non-finite loss at iter {it}, batch_skipped: {parts}")
+            optimizer.zero_grad(set_to_none=True)
+            if skipped > max_nonfinite_batches:
+                raise FloatingPointError(f"Non-finite loss {loss.item()}: {parts}. Lower LR or check boxes.")
+            continue
 
         optimizer.zero_grad(set_to_none=True)
         scaler.scale(loss).backward()
@@ -41,7 +47,9 @@ def train_one_epoch(model, loader, optimizer, scheduler, scaler, device,
         for k, v in loss_dict.items():
             sums[k] += v.item()
         n += 1
-    return {k: v / max(n, 1) for k, v in sums.items()}
+    out = {k: v / max(n, 1) for k, v in sums.items()}
+    out["skipped_batches"] = skipped
+    return out
 
 @torch.no_grad()
 def evaluate_map(model, loader, device, class_metrics: bool = False) -> dict:

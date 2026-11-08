@@ -223,3 +223,4 @@ mlruns/
 mlartifacts/
 .env
 requirements.txt
+.vscode/settings.json

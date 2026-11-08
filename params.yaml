@@ -31,16 +31,18 @@ augment:
   preset: strong                    # none | light | strong
 
 train:
-  epochs: 1
+  epochs: 20
   patience: 5
-  batch_size: 8
+  batch_size: 28
   num_workers: 4
   lr: 0.01
   momentum: 0.9
   weight_decay: 0.0001
   warmup_iters: 300
   grad_clip: 10.0
-  amp: false
+  amp: true
+  amp_dtype: bf16
+  max_nonfinite_batches: 10
   min_size: 800
   max_size: 1333
   trainable_backbone_layers: 3

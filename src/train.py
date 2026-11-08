@@ -102,6 +102,10 @@ def main():
     seed_everything(tp["seed"])
     device = pick_device()
     use_amp = bool(tp["amp"]) and device.type == "cuda"
+    amp_dtype = torch.bfloat16 if tp.get("amp_dtype", "bf16") == "bf16" else torch.float16
+    if use_amp and amp_dtype is torch.bfloat16 and torch.cuda.get_device_capability()[0] < 8:
+        print("Falling back to fp16 autocast")
+        amp_dtype = torch.float16
     print(f"[train] device={device} amp={use_amp} augment={preset}")
 
     #----- data
@@ -125,7 +129,7 @@ def main():
     scheduler = torch.optim.lr_scheduler.LambdaLR(
         optimizer, warmup_cosine(total_iters, min(tp["warmup_iters"], total_iters))
     )
-    scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
+    scaler = torch.amp.GradScaler("cuda", enabled=use_amp and amp_dtype is torch.float16)
 
     #----- tracking
     mlflow.set_tracking_uri(tp.get("mlflow_uri", "sqlite://mlflow.db"))
@@ -147,7 +151,8 @@ def main():
         for epoch in range(1, tp["epochs"] + 1):
             t0 = time.time()
             losses = train_one_epoch(model, train_loader, optimizer, scheduler, scaler,
-                                     device, use_amp, tp["grad_clip"])
+                                     device, use_amp, tp["grad_clip"], amp_dtype,
+                                     tp.get("max_nonfinite_batches, 10"))
             train_time = time.time() - t0
             val = evaluate_map(model, val_loader, device)
 
