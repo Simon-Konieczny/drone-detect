@@ -20,7 +20,20 @@ stages:
 
   evaluate:
     cmd: python src/evaluate.py
-    deps: [src/evaluate.py, src/dataset.py, models/model.pt, data/processed]
+    deps: [src/evaluate.py, src/model.py, src/dataset.py, src/transforms.py, models/model.pt, data/processed]
+    params: [evaluate, train.mlflow_uri, train.experiment]
     metrics:
-      - metrics.json:
+      - reports/eval_metrics.json:
+          cache: false
+    plots:
+      - reports/pr_curves.png:
+          cache: false
+  
+  export:
+    cmd: python src/export.py
+    deps: [src/export.py, src/model.py, src/dataset.py, models/model.pt, data/processed, reports/eval_metrics.json]
+    params: [export, evaluate.target_precision]
+    outs: [models/model.onnx]
+    metrics:
+      - reports/export_metrics.json:
           cache: false

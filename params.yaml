@@ -16,7 +16,12 @@ prepare:
   resplit:
     enabled: true
     n_folds: 10
-    priority: [drone, insect, helicopter, plane, bird]
+    priority:
+    - drone
+    - insect
+    - helicopter
+    - plane
+    - bird
     flock_class: bird
     flock_min_boxes: 5
   n_samples: 12
@@ -26,7 +31,7 @@ augment:
   preset: strong                    # none | light | strong
 
 train:
-  epochs: 20
+  epochs: 1
   patience: 5
   batch_size: 8
   num_workers: 4
@@ -51,7 +56,12 @@ evaluate:
   bootstrap_iters: 200
   ci: 0.95
   target_precision: 0.9
-  corruption: [motion_blur, noise, jpeg_q20, fog, low_light]
+  corruptions:
+  - motion_blur
+  - noise
+  - jpeg_q20
+  - fog
+  - low_light
   seed: 42
 
 export:

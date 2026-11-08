@@ -1,0 +1,3 @@
+!requirements-infer.txt
+!src/predict.py
+!models/model.onnx

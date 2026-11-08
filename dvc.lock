@@ -62,8 +62,8 @@ stages:
     deps:
     - path: data/processed
       hash: md5
-      md5: 5a8bafca2c4b1f71dc80769b7f1dd272.dir
-      size: 1510253
+      md5: e0969c36a37fb08469d9939d8f881e65.dir
+      size: 1762604
       nfiles: 4
     - path: src/dataset.py
       hash: md5
@@ -113,9 +113,111 @@ stages:
     outs:
     - path: models/model.pt
       hash: md5
-      md5: 2738dde39e96b0a918bc87bb13f3d234
+      md5: 51490eb44448539520910df76cefa210
       size: 76084675
     - path: reports/train_metrics.json
       hash: md5
-      md5: 9455a9aef0fcb9a8d4ec00dd5001e56b
-      size: 340
+      md5: 66b19de12d0459924009a8f0d185a003
+      size: 319
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: e0969c36a37fb08469d9939d8f881e65.dir
+      size: 1762604
+      nfiles: 4
+    - path: models/model.pt
+      hash: md5
+      md5: 51490eb44448539520910df76cefa210
+      size: 76084675
+    - path: src/dataset.py
+      hash: md5
+      md5: e4731d64145c254672e7704e5b5971bf
+      size: 1714
+    - path: src/evaluate.py
+      hash: md5
+      md5: 237f7d02594f0d96fcdbe08e22d39f80
+      size: 11089
+    - path: src/model.py
+      hash: md5
+      md5: 95854abff30c66025b3e2b8d85036def
+      size: 1658
+    - path: src/transforms.py
+      hash: md5
+      md5: f3008c011e9d59f44f847ed64cfa822b
+      size: 3459
+    params:
+      params.yaml:
+        evaluate:
+          batch_size: 8
+          num_workers: 2
+          bootstrap_iters: 200
+          ci: 0.95
+          target_precision: 0.9
+          corruptions:
+          - motion_blur
+          - noise
+          - jpeg_q20
+          - fog
+          - low_light
+          seed: 42
+        train.experiment: drone-detection
+        train.mlflow_uri: sqlite:///mlflow.db
+    outs:
+    - path: reports/eval_metrics.json
+      hash: md5
+      md5: 4e2147af4c3e3eab50f965764ad57afd
+      size: 4711
+    - path: reports/pr_curves.png
+      hash: md5
+      md5: 5c6b1109958cf5f2f4acf4a5487cfd30
+      size: 86912
+  export:
+    cmd: python src/export.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: e0969c36a37fb08469d9939d8f881e65.dir
+      size: 1762604
+      nfiles: 4
+    - path: models/model.pt
+      hash: md5
+      md5: 51490eb44448539520910df76cefa210
+      size: 76084675
+    - path: reports/eval_metrics.json
+      hash: md5
+      md5: 4e2147af4c3e3eab50f965764ad57afd
+      size: 4711
+    - path: src/dataset.py
+      hash: md5
+      md5: e4731d64145c254672e7704e5b5971bf
+      size: 1714
+    - path: src/export.py
+      hash: md5
+      md5: de1e1bd2ec9bcbdac2c83273f378b5d4
+      size: 5966
+    - path: src/model.py
+      hash: md5
+      md5: 95854abff30c66025b3e2b8d85036def
+      size: 1658
+    params:
+      params.yaml:
+        evaluate.target_precision: 0.9
+        export:
+          opset: 17
+          num_threads: 4
+          parity_images: 100
+          parity_tol: 0.01
+          warmup_runs: 5
+          latency_runs: 30
+          fallback_score_threshold: 0.5
+    outs:
+    - path: models/model.onnx
+      hash: md5
+      md5: a78c6c3ea3594738b4146a6f0825e1e5
+      size: 76057265
+    - path: reports/export_metrics.json
+      hash: md5
+      md5: 15c9fa1cc7e8b73c1829ab13ac3e782c
+      size: 706
