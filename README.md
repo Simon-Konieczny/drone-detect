@@ -15,6 +15,73 @@ data/raw ──► prepare ──► train ──► evaluate ──► export �
 
 Each stage is defined in `dvc.yaml` with its code, data and parameters as dependencies. `dvc repro` only reruns the stages affected by a change, and `dvc.lock` records the exact versions behind every result. All parameters live in `params.yaml`.
 
+## Results
+
+All numbers are on the held-out test split (783 images) unless stated otherwise. The model is the checkpoint from epoch 17 of 20, selected on validation mAP and trained with the strong augmentation preset (about 4 minutes per epoch on a laptop GPU). Values in brackets are 95% bootstrap confidence intervals.
+
+### Detection
+
+| Metric | Value |
+|---|---|
+| mAP (IoU 0.50:0.95) | 0.550 [0.528, 0.591] |
+| mAP50 | 0.891 [0.871, 0.917] |
+| mAP small / medium / large | 0.160 / 0.528 / 0.705 |
+
+| Class | AP50 | AP (IoU 0.50:0.95) |
+|---|---|---|
+| drone | 0.977 [0.958, 0.989] | 0.760 [0.735, 0.786] |
+| plane | 0.936 [0.899, 0.962] | 0.596 [0.559, 0.627] |
+| helicopter | 0.899 [0.857, 0.947] | 0.548 [0.499, 0.593] |
+| insect | 0.878 [0.835, 0.984] | 0.467 [0.388, 0.678] |
+| bird | 0.762 [0.678, 0.859] | 0.380 [0.326, 0.443] |
+
+Drones are the strongest class, but this partly reflects the data: most drones in the dataset are close to the camera. Small objects remain the main weakness (small-object mAP of 0.16), so long-range detection is not solved by this model. Birds are the weakest class because of flock scenes with many small birds, and their precision drops sharply above 0.8 recall.
+
+The selected checkpoint scored 0.592 mAP on validation and 0.550 on test.
+
+### Operating points
+
+The score threshold for each class was chosen on validation as the highest recall at 90% precision, then applied unchanged to the test set.
+
+| Class | Threshold | Val recall | Val precision | Test recall | Test precision |
+|---|---:|---:|---:|---:|---:|
+| drone | 0.24 | 0.96 | 0.91 | 0.96 | 0.95 |
+| plane | 0.58 | 0.88 | 0.91 | 0.89 | 0.94 |
+| helicopter | 0.20 | 0.90 | 0.91 | 0.91 | 0.92 |
+| bird | 0.82 | 0.61 | 0.90 | 0.62 | 0.97 |
+| insect | 0.86 | 0.54 | 0.93 | 0.74 | 0.87 |
+
+For drones, the model detects 96% of targets on the test set at 95% precision. Four of the five classes keep at least 90% precision on test. Insects fall to 87%: they have the fewest examples and the widest confidence interval, so a threshold estimated on a small validation sample does not transfer exactly.
+
+![Test PR curves](reports/pr_curves.png)
+
+### Robustness
+
+The test set was run again under each corruption at a fixed severity.
+
+| Condition | mAP50 | Drop | Drone AP50 |
+|---|---:|---:|---:|
+| Clean | 0.891 | | 0.977 |
+| Motion blur | 0.877 | 0.014 | 0.958 |
+| JPEG quality 20 | 0.865 | 0.026 | 0.977 |
+| Low light | 0.845 | 0.046 | 0.910 |
+| Noise | 0.841 | 0.050 | 0.963 |
+| Fog | 0.833 | 0.057 | 0.955 |
+
+Fog and noise cause the largest overall drops. For drones, low light has the largest effect (0.977 to 0.910), and fog affects insects most (0.878 to 0.771). These corruptions are similar to the training augmentations, so this measures robustness to conditions the model was trained for rather than performance on real footage in bad weather.
+
+### Deployment
+
+Latency was measured on a single 640x640 image with 4 threads on a laptop CPU, and includes the model's internal resize to 800 pixels.
+
+| | PyTorch | ONNX Runtime |
+|---|---:|---:|
+| Median latency | 91.8 ms | 43.7 ms |
+| 95th percentile latency | 104.0 ms | 52.3 ms |
+| mAP on 100 validation images | 0.600 | 0.600 |
+
+The ONNX model (76 MB) is 2.1 times faster than PyTorch on CPU with identical accuracy.
+
 ## Quickstart
 
 ```bash
@@ -137,6 +204,8 @@ docker run --rm -v "$PWD/images:/data" drone-detector /data --out /data/preds
 
 This writes the images with predicted boxes and a `predictions.json` file to `/data/preds`.
 
-## Results
+### Next steps
 
-Training is in progress. This section will include the comparison between training with and without augmentation, per-class AP with confidence intervals on the test set, the operating points, the robustness results and the ONNX latency figures.
+- Train with `augment.preset=none` to measure what augmentation contributes, in particular under the corruption tests.
+- Improve detection of small, distant targets with a larger input size, more long-range drone images or a detector designed for small objects.
+- Test on real footage in poor conditions, since the corruption tests are synthetic.
