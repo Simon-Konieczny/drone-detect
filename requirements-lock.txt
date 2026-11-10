@@ -103,7 +103,6 @@ opentelemetry-proto==1.45.2
 opentelemetry-sdk==1.45.2
 opentelemetry-semantic-conventions==0.66b2
 orjson==3.13.0
-packaging @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_packaging_1785888127/work
 pandas==3.1.1
 pathspec==1.1.1
 pillow==13.0.0
