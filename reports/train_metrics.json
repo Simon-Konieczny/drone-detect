@@ -1,11 +1,11 @@
 {
-  "best_epoch": 17,
+  "best_epoch": 15,
   "epochs_run": 20,
-  "best_val_map": 0.5921662449836731,
-  "best_val_map_50": 0.9093647003173828,
-  "best_val_map_75": 0.5751575231552124,
-  "best_val_map_small": 0.13005657494068146,
-  "best_val_map_medium": 0.6042285561561584,
-  "best_val_map_large": 0.8617931604385376,
-  "best_val_mar_100": 0.6205357313156128
+  "best_val_map": 0.5962657928466797,
+  "best_val_map_50": 0.9168850779533386,
+  "best_val_map_75": 0.7213283777236938,
+  "best_val_map_small": 0.05658887326717377,
+  "best_val_map_medium": 0.6400742530822754,
+  "best_val_map_large": 0.8556765913963318,
+  "best_val_mar_100": 0.6098214387893677
 }

@@ -28,7 +28,7 @@ prepare:
   seed: 42
 
 augment:
-  preset: strong                    # none | light | strong
+  preset: light                    # none | light | strong
 
 train:
   epochs: 20
@@ -47,10 +47,10 @@ train:
   max_size: 1333
   trainable_backbone_layers: 3
   seed: 42
-  experiment: drone-detection
+  experiment: drone-detection-light
   mlflow_uri: sqlite:///mlflow.db
   register_model: true
-  registered_model_name: drone-detector
+  registered_model_name: drone-detector-light
 
 evaluate:
   batch_size: 8

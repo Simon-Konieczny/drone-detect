@@ -84,7 +84,7 @@ stages:
     params:
       params.yaml:
         augment:
-          preset: strong
+          preset: light
         prepare.classes:
         - bird
         - drone
@@ -108,18 +108,18 @@ stages:
           max_size: 1333
           trainable_backbone_layers: 3
           seed: 42
-          experiment: drone-detection
+          experiment: drone-detection-light
           mlflow_uri: sqlite:///mlflow.db
           register_model: true
-          registered_model_name: drone-detector
+          registered_model_name: drone-detector-light
     outs:
     - path: models/model.pt
       hash: md5
-      md5: 270e806c126e98d0c38df40575fcdcf6
+      md5: 3efb3a8bb34197ac338f5eb448832897
       size: 76088643
     - path: reports/train_metrics.json
       hash: md5
-      md5: fdaa20a87d82b99cd2e5bf381e8f022d
+      md5: 5621d7a3c6a731965464c20801de93eb
       size: 348
   evaluate:
     cmd: python src/evaluate.py
@@ -131,7 +131,7 @@ stages:
       nfiles: 4
     - path: models/model.pt
       hash: md5
-      md5: 270e806c126e98d0c38df40575fcdcf6
+      md5: 3efb3a8bb34197ac338f5eb448832897
       size: 76088643
     - path: src/dataset.py
       hash: md5
@@ -164,17 +164,17 @@ stages:
           - fog
           - low_light
           seed: 42
-        train.experiment: drone-detection
+        train.experiment: drone-detection-light
         train.mlflow_uri: sqlite:///mlflow.db
     outs:
     - path: reports/eval_metrics.json
       hash: md5
-      md5: 9a11e40222e8f86cd1df7d9411e8574c
-      size: 4897
+      md5: 29eda5fed7085db77c132036ab609705
+      size: 4892
     - path: reports/pr_curves.png
       hash: md5
-      md5: 9b7fa46f4c707c111a0f944017b86fbe
-      size: 70267
+      md5: 408d3d7a437ee1af2318f4046cd332e9
+      size: 69238
   export:
     cmd: python src/export.py
     deps:
@@ -185,12 +185,12 @@ stages:
       nfiles: 4
     - path: models/model.pt
       hash: md5
-      md5: 270e806c126e98d0c38df40575fcdcf6
+      md5: 3efb3a8bb34197ac338f5eb448832897
       size: 76088643
     - path: reports/eval_metrics.json
       hash: md5
-      md5: 9a11e40222e8f86cd1df7d9411e8574c
-      size: 4897
+      md5: 29eda5fed7085db77c132036ab609705
+      size: 4892
     - path: src/dataset.py
       hash: md5
       md5: 784b190d147ab009262b0a5091d49701
@@ -217,9 +217,9 @@ stages:
     outs:
     - path: models/model.onnx
       hash: md5
-      md5: 9f09cb089c153a43c1a814d3651d9f63
-      size: 76057264
+      md5: 420c2f57dd32ab8721cae54df1a15b7f
+      size: 76057263
     - path: reports/export_metrics.json
       hash: md5
-      md5: a8982a3ab5ad4fe4bfe05a8f97575389
-      size: 734
+      md5: e04d11888125bbc48fcfb82a738bd518
+      size: 732

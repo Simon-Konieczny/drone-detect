@@ -53,7 +53,7 @@ The score threshold for each class was chosen on validation as the highest recal
 
 For drones, the model detects 96% of targets on the test set at 95% precision. Four of the five classes keep at least 90% precision on test. Insects fall to 87%: they have the fewest examples and the widest confidence interval, so a threshold estimated on a small validation sample does not transfer exactly.
 
-![Test PR curves](reports/pr_curves.png)
+![Test PR curves](reports/pr_curves_strong_20.png)
 
 ### Robustness
 
