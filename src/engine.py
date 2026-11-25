@@ -66,11 +66,11 @@ def evaluate_map(model, loader, device, class_metrics: bool = False) -> dict:
             [{k: v.detach().cpu() for k, v in p.items()} for p in preds],
             [{"boxes": t["boxes"], "labels": t["labels"]} for t in targets],
         )
-        res = metric.compute()
-        scalars = {k: float(v) for k, v in res.items() if v.numel() == 1}
-        if class_metrics:
-            scalars["per_class"] = {
-                int(c): {"map": float(m), "mar_100": float(r)}
-                for c, m, r in zip(res["classes"], res["map_per_class"], res["mar_100_per_class"])
-            }
-        return scalars
+    res = metric.compute()
+    scalars = {k: float(v) for k, v in res.items() if v.numel() == 1}
+    if class_metrics:
+        scalars["per_class"] = {
+            int(c): {"map": float(m), "mar_100": float(r)}
+            for c, m, r in zip(res["classes"], res["map_per_class"], res["mar_100_per_class"])
+        }
+    return scalars
