@@ -28,7 +28,7 @@ prepare:
   seed: 42
 
 augment:
-  preset: light                    # none | light | strong
+  preset: strong                    # none | light | strong
 
 train:
   epochs: 20
