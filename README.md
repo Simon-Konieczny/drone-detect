@@ -82,6 +82,17 @@ Latency was measured on a single 640x640 image with 4 threads on a laptop CPU, a
 
 The ONNX model (76 MB) is 2.1 times faster than PyTorch on CPU with identical accuracy.
 
+### Latency
+
+Additionally, `src/scene_latency.py` measures the difference in latency between an empty sky image (0 GT) and the image in the dataset with the most GTs (55).
+
+| image | size | GT | proposals | dets | p50 ms | p95 ms |
+|---|---:|---:|---|---:|---:|---:|
+| empty sky      | 640x640 |  0   |     26 |   2 |   40.4  | 46.2 |
+| densest flock  | 640x640 | 55   |   1000 | 100 |  193.6  | 212.2 |
+
+Clearly, the two-stage detector introduces major latency in noisier scenes (~4.5x).
+
 ## Quickstart
 
 ```bash
